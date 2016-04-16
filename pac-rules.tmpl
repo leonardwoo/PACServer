@@ -1,0 +1,9 @@
+{
+    {{ range $index, $value := .Domains}}
+    "{{ $index }}": {{ $value }},{{ end}}
+
+    {{ with .Custom}}{{range $ii, $vv := .}}
+    "{{$ii}}": {{$vv}},{{end}}{{end}}
+
+    "__THE_END__": 1
+}
