@@ -78,7 +78,7 @@ func createRulesContent()  {
   RULES = bout.toString()
 }
 
-func handler(writer http.ResponseWriter, request *http.Request) {
+func pacHandler(writer http.ResponseWriter, request *http.Request) {
   content string := ""
   if fin, err := os.Open("abs.js"); err != nil {
     log.Fatal("failed to load page", err)
