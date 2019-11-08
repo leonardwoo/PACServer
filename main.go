@@ -9,7 +9,7 @@ import (
   "bufio"
   "io"
   "encoding/base64"
-  "text/template"
+  // "text/template"
 )
 
 const (
@@ -38,12 +38,19 @@ type rulestmpl struct {
 func createRulesContent()  {
   //convert gfwlist to pac rules.
 
-  if res, err := http.Get(RULESLISTADDR); err != nil {
+  if resp, err := http.Get(RULESLISTADDR); err != nil {
 		log.Fatal("GET error:", err)
     return
   }
-  decoded, err := base64.NewDecoder(res.Body)
-  if err != nil || decode == 1 {
+  defer resp.Body.Close()
+  body, err := ioutil.ReadAll(resp.Body)
+  // if err != nil {
+  //   log.Fatal("request body is null:", err)
+	// 	return
+	// }
+
+  decoded, err := base64.StdEncoding.DecodeString(body)
+  if err != nil {
     log.Fatal("decode error:", err)
 		return
 	}
@@ -65,11 +72,10 @@ func createRulesContent()  {
 			}
 		}
 	}
-	res.Body.Close()
 
-	if tmpl, err := template.ParseFiles("pac-rules.tmpl"); err != nil {
-		log.Fatal(err)
-	}
+	// if tmpl, err := template.ParseFiles("pac-rules.tmpl"); err != nil {
+	// 	log.Fatal(err)
+	// }
 
   bout := bytes.NewBuffer(make([]byte, 0))
   out := bufio.NewWriter(bout)
@@ -78,7 +84,7 @@ func createRulesContent()  {
 	}
   out.Flush()
   RULES = bout.toString()
-  log.Info("rules -> " + RULES)
+  log.Println("rules -> " + RULES)
 }
 
 func pacHandler(writer http.ResponseWriter, request *http.Request) {
