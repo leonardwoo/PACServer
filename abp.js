@@ -3,9 +3,9 @@
 *
 */
 
-var proxy = "${PROXY}";
+var proxy = __PROXY__;
 
-var rules = ${RULES};
+var rules = __RULES__;
 
 /*
 * This file is part of Adblock Plus <http://adblockplus.org/>,

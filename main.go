@@ -7,21 +7,22 @@ import (
 	"log"
   "bytes"
   "bufio"
+  "io"
   "encoding/base64"
   "text/template"
 )
 
 const (
-  SERVER_ADDR string := ""
-  SERVER_PORT int := 8880
+  //SERVER_ADDR string = ""
+  SERVER_PORT int = 8880
 
-  REPLACE_ALL int := -1
+  REPLACE_ALL int = -1
 
-  PROXY string := "PROXY 192.168.1.1:1080"
-  RULESLISTADDR string := "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
+  PROXY string = "\"PROXY 10.100.1.2:1080\""
+  RULESLISTADDR string = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
 )
 
-var RULES string := ""
+var RULES string = ""
 
 type rulestmpl struct {
 	/* proxy address */
@@ -40,8 +41,9 @@ func createRulesContent()  {
   if res, err := http.Get(RULESLISTADDR); err != nil {
 		log.Fatal("GET error:", err)
     return
-	}
-  if decoded, err := base64.NewDecoder(res.Body); err != nil {
+  }
+  decoded, err := base64.NewDecoder(res.Body)
+  if err != nil || decode == 1 {
     log.Fatal("decode error:", err)
 		return
 	}
@@ -76,10 +78,11 @@ func createRulesContent()  {
 	}
   out.Flush()
   RULES = bout.toString()
+  log.Info("rules -> " + RULES)
 }
 
 func pacHandler(writer http.ResponseWriter, request *http.Request) {
-  content string := ""
+  var content string = ""
   if fin, err := os.Open("abs.js"); err != nil {
     log.Fatal("failed to load page", err)
     content = "failed to load page"
@@ -91,10 +94,10 @@ func pacHandler(writer http.ResponseWriter, request *http.Request) {
       content += string(buf[:n])
     }
 
-    strings.Replace(content, "${PROXY}", PROXY, REPLACE_ALL)
+    strings.ReplaceAll(content, "__PROXY__", PROXY)
 
     createRulesContent()
-    strings.Replace(content, "${RULES}", RULES, REPLACE_ALL)
+    strings.ReplaceAll(content, "__RULES__", RULES)
   }
   fmt.Fprint(writer, content)
 }
