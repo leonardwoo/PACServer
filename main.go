@@ -18,7 +18,7 @@ const (
 
   REPLACE_ALL int = -1
 
-  PROXY string = "\"PROXY 10.100.1.2:1080\""
+  PROXY string = "\"PROXY 127.0.0.1:1080\""
   RULESLISTADDR string = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
 )
 
